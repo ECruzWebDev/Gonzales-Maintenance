@@ -1,0 +1,274 @@
+<!doctype html>
+<html lang="en">
+	<head>
+		<meta charset="utf-8" />
+		<meta name="viewport" content="width=device-width, initial-scale=1" />
+		<title>Gonzales Maintenance — Residential Maintenance</title>
+		<style>
+			:root{--accent:#0f766e;--dark:#0b1220;--muted:#6b7280}
+			*{box-sizing:border-box}
+			body{font-family:Inter,Segoe UI,system-ui,Roboto,Arial,sans-serif;margin:0;color:#0b1220;background-color:#f4fbff;background-image:linear-gradient(135deg,#f8fbff 0%,#eef6fb 50%,#e6f1f8 100%),repeating-linear-gradient(45deg, rgba(2,6,23,0.02) 0 1px, transparent 1px 26px);background-attachment:fixed}
+
+			/* Sticky navbar */
+			.nav{position:fixed;top:0;left:0;right:0;background:rgba(255,255,255,0.98);backdrop-filter:blur(6px);border-bottom:1px solid #eee;height:64px;display:flex;align-items:center;z-index:1000;padding:0 20px}
+			.nav .brand{font-weight:700;color:var(--accent);margin-right:24px}
+			.menu-toggle{display:none;background:transparent;border:none;font-size:22px;color:var(--dark);margin-left:auto}
+			.nav .links{display:flex;gap:16px}
+			.nav a{color:#111;text-decoration:none;padding:8px 10px;border-radius:6px}
+			.nav a:hover{background:#f3f4f6}
+
+			/* mobile nav open state */
+			.nav.open .menu-toggle{color:var(--accent)}
+			@media(max-width:900px){
+				.nav .links{display:none}
+				.menu-toggle{display:block}
+				.nav.open .links{display:flex;flex-direction:column;position:absolute;left:0;right:0;top:64px;background:rgba(255,255,255,0.98);padding:12px 18px;border-bottom:1px solid #eee;box-shadow:0 6px 20px rgba(2,6,23,0.08)}
+				.nav.open ~ main{padding-top:240px}
+				.nav.open .links a{padding:12px 8px}
+			}
+
+			/* offset for fixed nav */
+			main{padding-top:80px}
+
+			/* Banner (modern layered background) */
+			.banner{min-height:60vh;display:flex;align-items:center;justify-content:center;background-size:cover;background-position:center;position:relative;padding:40px;overflow:hidden}
+			.banner{background-repeat:no-repeat;background-attachment:scroll}
+			.banner .overlay{position:absolute;inset:0;background:linear-gradient(180deg,rgba(11,18,32,0.2),rgba(11,18,32,0.5))}
+			/* combine subtle radial highlights with a color gradient over the image */
+			.banner::before{content:'';position:absolute;inset:0;background-image:radial-gradient(circle at 12% 18%, rgba(255,255,255,0.05), transparent 12%), radial-gradient(circle at 88% 80%, rgba(255,255,255,0.03), transparent 10%);pointer-events:none}
+			.banner .content{position:relative;z-index:2;color:#fff;max-width:1100px;text-align:left}
+			.banner h1{font-size:clamp(28px,4vw,44px);margin:0 0 12px}
+			.banner p{margin:0 0 18px;color:rgba(255,255,255,0.9)}
+			.btn{background:var(--accent);color:#fff;padding:10px 16px;border-radius:8px;text-decoration:none;display:inline-block;box-shadow:0 8px 20px rgba(15,118,110,0.12)}
+
+			/* Form */
+			.container{max-width:1100px;margin:40px auto;padding:0 20px}
+			.card{background:#ffffff;border:1px solid rgba(15,21,28,0.06);border-radius:10px;padding:20px;box-shadow:0 12px 30px rgba(2,6,23,0.06)}
+			form .row{display:flex;gap:12px}
+			form label{display:block;font-size:13px;color:var(--muted);margin-bottom:6px}
+			input,select,textarea{width:100%;padding:10px;border:1px solid #d1d5db;border-radius:8px;font-size:15px}
+			textarea{min-height:120px}
+
+			/* Carousel */
+			.carousel-wrap{display:flex;justify-content:center;margin:40px 0}
+			/* Ensure carousel is exactly the visible frame (no internal padding from .card)
+			   so slides measure the carousel width and do not overflow. */
+			.carousel{width:75vw;max-width:1000px;overflow:hidden;border-radius:12px;position:relative}
+			.carousel.card{padding:0}
+			.slides{display:flex;transition:transform 400ms ease}
+			.slide{min-width:100%;flex-shrink:0;box-sizing:border-box}
+			.slide img{display:block;width:100%;height:420px;object-fit:cover}
+			.carousel .controls{position:absolute;top:50%;left:0;right:0;display:flex;justify-content:space-between;transform:translateY(-50%);pointer-events:none}
+			.carousel button{pointer-events:auto;background:rgba(0,0,0,0.45);border:none;color:#fff;padding:8px 10px;margin:0 8px;border-radius:8px}
+
+			/* Map */
+			.map{height:420px;border-radius:10px;overflow:hidden;margin:40px 0}
+
+			/* Responsive Google Calendar iframe in #schedule */
+			#schedule .card iframe{width:100%;height:600px;border:0;display:block}
+			@media(max-width:900px){
+				#schedule .card iframe{height:520px}
+			}
+			@media(max-width:600px){
+				#schedule .card iframe{height:420px}
+			}
+			@media(max-width:420px){
+				#schedule .card iframe{height:320px}
+			}
+
+			/* Responsive tweaks */
+			@media(max-width:900px){
+				.banner{padding:30px 18px}
+				.slide img{height:260px}
+				form .row{flex-direction:column}
+				.carousel{width:95vw}
+				.map{height:320px}
+			}
+		</style>
+	</head>
+	<body>
+		<header class="nav" role="banner">
+			<div class="brand">Gonzales Maintenance</div>
+			<button class="menu-toggle" aria-label="Toggle menu" aria-expanded="false">☰</button>
+			<nav class="links" aria-label="Main navigation">
+				<a href="#home">Home</a>
+				<a href="#request">Request Info</a>
+				<a href="#gallery">Gallery</a>
+				<a href="#area">Service Area</a>
+			</nav>
+		</header>
+
+		<main>
+			<section id="home" class="banner" style="background-image:url('https://images.unsplash.com/photo-1570129477492-45c003edd2be?auto=format&fit=crop&w=1600&q=80')">
+				<div class="overlay" aria-hidden="true"></div>
+				<div class="content container">
+					<h1>Reliable Residential Maintenance in Austin</h1>
+					<p>Experienced technicians for plumbing, electrical, carpentry, and general home repairs. Fast, Accurate, and honest.</p>
+					<a class="btn" href="#request">Request Information</a>
+				</div>
+			</section>
+
+			<section id="request" class="container">
+				<div class="card">
+					<h2 style="margin-top:0">Request Information</h2>
+					<p style="color:var(--muted)">Fill out the form and we will contact you to schedule a free estimate.</p>
+					<form id="requestForm">
+						<div class="row">
+							<div style="flex:1">
+								<label for="name">Full name</label>
+								<input id="name" name="name" required placeholder="Jane Doe" />
+							</div>
+							<div style="flex:1">
+								<label for="phone">Phone</label>
+								<input id="phone" name="phone" required placeholder="(512) 555-0123" />
+							</div>
+						</div>
+
+						<div class="row" style="margin-top:12px">
+							<div style="flex:1">
+								<label for="email">Email</label>
+								<input id="email" name="email" type="email"  placeholder="you@example.com" />
+							</div>
+							<div style="flex:1">
+								<label for="service">Service type</label>
+								<select id="service" name="service">
+									<option>General repair</option>
+									<option>Plumbing</option>
+									<option>Electrical</option>
+									<option>Carpentry</option>
+									<option>Painting</option>
+								</select>
+							</div>
+						</div>
+
+						<div style="margin-top:12px">
+							<label for="address">Address (or neighborhood)</label>
+							<input id="address" name="address" required placeholder="Austin, TX or street address" />
+						</div>
+
+						<div style="margin-top:12px">
+							<label for="message">Message / Details</label>
+							<textarea id="message" name="message" placeholder="Describe the problem or service needed"></textarea>
+						</div>
+
+						<div style="margin-top:14px;display:flex;gap:12px;align-items:center">
+							<button class="btn" type="submit">Send Request</button>
+							<div id="formStatus" style="color:var(--muted)"></div>
+						</div>
+					</form>
+				</div>
+			</section>
+
+			<section id="gallery" class="container">
+				<h2>Recent Jobs</h2>
+				<div class="carousel-wrap">
+					<div class="carousel card" aria-roledescription="carousel">
+						<div class="slides">
+							<div class="slide"><img alt="Maintenance job 1" src="https://images.unsplash.com/photo-1515378791036-0648a3ef77b2?auto=format&fit=crop&w=1600&q=80"/></div>
+							<div class="slide"><img alt="Maintenance job 2" src="hvac maint.jpg"/></div>
+							<div class="slide"><img alt="Maintenance job 3" src="light install.jpg"/></div>
+						</div>
+						<div class="controls">
+							<div style="display:flex;justify-content:space-between;width:100%;padding:0 12px">
+								<button id="prevBtn" aria-label="Previous">◀</button>
+								<button id="nextBtn" aria-label="Next">▶</button>
+							</div>
+						</div>
+					</div>
+				</div>
+			</section>
+
+					<section id="schedule" class="container">
+						<h2>Schedule an Appointment</h2>
+						<p style="color:var(--muted);margin-top:6px">Book a time directly on our calendar.</p>
+						<div class="card">
+							<!-- Google Calendar Appointment Scheduling begin -->
+							<iframe src="https://calendar.google.com/calendar/appointments/schedules/AcZssZ0Ru8qPK_W9xWpbJQi8Q-3llsc1PTC1OiKPJ69BVwJwYMTsG5lHCvYbzsCSCB3G2Apa8jsiGdhk?gv=true" style="border: 0" width="100%" height="600" frameborder="0"></iframe>
+							<!-- end Google Calendar Appointment Scheduling -->
+						</div>
+					</section>
+
+                   
+
+			<section id="area" class="container">
+				<h2>Service Area — Austin, TX and Surrounding.</h2>
+				<p style="color:var(--muted);margin-top:6px">We serve homes and appartments across Austin and nearby cities.</p>
+				<div class="map card">
+					<iframe title="Austin service area" src="https://www.google.com/maps?q=Austin,+TX&output=embed" width="100%" height="100%" style="border:0" loading="lazy" referrerpolicy="no-referrer-when-downgrade"></iframe>
+				</div>
+			</section>
+		</main>
+
+		<script>
+			// Smooth scroll for nav anchor links and close mobile menu after click
+			document.querySelectorAll('.nav a').forEach(a=>{
+				a.addEventListener('click', (e)=>{
+					e.preventDefault();
+					const id = a.getAttribute('href').slice(1);
+					const el = document.getElementById(id);
+					// close mobile menu if open
+					const nav = document.querySelector('.nav');
+					const toggle = document.querySelector('.menu-toggle');
+					if(nav.classList.contains('open')){ nav.classList.remove('open'); toggle.setAttribute('aria-expanded','false'); }
+					if(el) el.scrollIntoView({behavior:'smooth',block:'start'});
+				});
+			});
+
+			// Mobile menu toggle
+			(function(){
+				const menuToggle = document.querySelector('.menu-toggle');
+				const nav = document.querySelector('.nav');
+				menuToggle.addEventListener('click', ()=>{
+					const expanded = menuToggle.getAttribute('aria-expanded') === 'true';
+					menuToggle.setAttribute('aria-expanded', String(!expanded));
+					nav.classList.toggle('open');
+				});
+			})();
+
+			// Simple carousel
+			(function(){
+				const slidesEl = document.querySelector('.slides');
+				const slides = document.querySelectorAll('.slide');
+				const prev = document.getElementById('prevBtn');
+				const next = document.getElementById('nextBtn');
+				let idx = 0; let autoplay = true; let timer = null;
+
+				function show(i){
+					idx = (i + slides.length) % slides.length;
+					slidesEl.style.transform = `translateX(${-idx * 100}%)`;
+				}
+				function nextSlide(){ show(idx+1) }
+				function prevSlide(){ show(idx-1) }
+
+				next.addEventListener('click', ()=>{ nextSlide(); resetTimer(); });
+				prev.addEventListener('click', ()=>{ prevSlide(); resetTimer(); });
+
+				function resetTimer(){
+					if(timer) clearInterval(timer);
+					if(autoplay) timer = setInterval(nextSlide,3500);
+				}
+
+				// start
+				resetTimer();
+				// pause when user hovers
+				const carouselEl = document.querySelector('.carousel');
+				carouselEl.addEventListener('mouseenter', ()=>{ if(timer) clearInterval(timer); });
+				carouselEl.addEventListener('mouseleave', resetTimer);
+			})();
+
+			// Simple form handling (client-side only)
+			document.getElementById('requestForm').addEventListener('submit', function(e){
+				e.preventDefault();
+				const status = document.getElementById('formStatus');
+				// basic validation
+				const name = document.getElementById('name').value.trim();
+				const email = document.getElementById('email').value.trim();
+				if(!name || !email){ status.textContent = 'Please provide name and email.'; status.style.color='crimson'; return; }
+				status.style.color='green'; status.textContent = 'Thanks — your request was received (client-only demo).';
+				// Reset form after short delay
+				setTimeout(()=>{ this.reset(); status.textContent=''; },2500);
+			});
+		</script>
+	</body>
+</html>
+
